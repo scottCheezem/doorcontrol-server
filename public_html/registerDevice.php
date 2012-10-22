@@ -32,14 +32,14 @@ if(isset($_POST['appid']) && isset($_POST['devid']) && isValidUDID($_POST['devid
 		//add the deviceid to the table
        	 	$idcheck = 'select COUNT(*) from IOSpushDevices where devicetoken = "'.$devid.'" and appid = "'.$appid.'"';
         	$query = mysql_query($idcheck);
-        	$numRows = mysql_num_rows($query);
+        	$numRows = mysql_num_rows($query, $con);
         	echo "ran ". $idcheck  . " got ".$numRows ."\n";
 		if($numRows == 0 ){
             		//this particular combination is not in the db...
             		echo "inserting...\n";
             		$insertNewDeviceId = 'insert into IOSpushDevices (devicetoken, appid) VALUES("'.$devid.'", "'.$appid.'")';
             		echo $insertNewDeviceId."\n";
-            		$query = mysql_query(insertNewDeviceId);
+            		$query = mysql_query($insertNewDeviceId, $con);
                 }
 	}
     mysql_close($con);
