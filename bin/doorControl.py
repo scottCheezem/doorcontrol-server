@@ -8,6 +8,7 @@
 
 
 import serial
+import datetime
 import time
 import sys
 import os
@@ -56,25 +57,25 @@ else:
 	                f = open(dev, 'w')
 	                f.write(sys.argv[1])
 	                f.close()
+			f = open("/home/doorcontrol/public_html/log", 'a')
+			f.write("Locking - ")
+			f.write(str(datetime.datetime.now()))
+			f.write("\n")
+			f.close()
 	                sys.exit()
 		if sys.argv[1] == "U":
 			print "printing U command"
 			f = open(dev, 'w')
 			f.write(sys.argv[1])
 			f.close()
+                        f = open("/home/doorcontrol/public_html/log", 'a')
+                        f.write("UNLocking ")
+			f.write(str(datetime.datetime.now()))
+			f.write("\n")
 			sys.exit()
 
 	exit()
 
-
-
-if len(sys.argv)>1:
-	if sys.argv[1] == "L":
-		print "writing command"
-		f = open(dev, 'w')
-		f.write(sys.argv[1])
-		f.close()
-		sys.exit()
 
 
 
@@ -86,8 +87,6 @@ x=conn.cursor()
 if ser:
 	while True:
 		output =  ser.readline()
-#ok now write to somewhere useful like a db
-				
 #		print output[:-2]
 		if output == "exit\r\n":
 #            		print "got exit command\n"

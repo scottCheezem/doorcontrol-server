@@ -18,9 +18,11 @@ header("Content-type: text/json");
 
         switch($command){
             case ('l'|'L'):
+		echo "LOCKING";
                 `doorControl.py L`;
             break;
             case ('u'|'U'):
+		echo "UNLOCKING";
                 `doorControl.py U`;
             break;
 	}
