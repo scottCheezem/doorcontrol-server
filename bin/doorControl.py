@@ -13,6 +13,8 @@ import sys
 import os
 import MySQLdb
 
+dev = '/dev/ttyUSB1'
+rate = 9600
 
 def is_running():
 	running = 0;
@@ -36,7 +38,7 @@ print "how many? ",is_running()
 
 
 if(is_running() == 1):
-	print "forking"	
+	print "first run. Daemonizing"	
 	pid = os.fork()
 	if pid > 0:
 		sys.exit(0)
@@ -48,22 +50,32 @@ if(is_running() == 1):
 
 
 else:
+	if len(sys.argv)>1:
+	        if sys.argv[1] == "L":
+	                print "writing L command"
+	                f = open(dev, 'w')
+	                f.write(sys.argv[1])
+	                f.close()
+	                sys.exit()
+		if sys.argv[1] == "U":
+			print "printing U command"
+			f = open(dev, 'w')
+			f.write(sys.argv[1])
+			f.close()
+			sys.exit()
+
 	exit()
 
 
-dev = '/dev/ttyUSB1'
-rate = 9600
 
 if len(sys.argv)>1:
 	if sys.argv[1] == "L":
+		print "writing command"
 		f = open(dev, 'w')
 		f.write(sys.argv[1])
 		f.close()
 		sys.exit()
 
-#os.chdir("/")
-#os.setsid()
-#os.umask(0)
 
 
 ser = serial.Serial(dev, rate)
