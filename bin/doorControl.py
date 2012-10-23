@@ -43,10 +43,10 @@ if(is_running() == 1):
 	pid = os.fork()
 	if pid > 0:
 		sys.exit(0)
-	elif pid == 0:
-		os.chdir("/")
-		os.setsid()
-		os.umask(0)
+#	elif pid == 0:
+#		os.chdir("/")
+#		os.setsid()
+#		os.umask(0)
 
 
 
@@ -64,7 +64,7 @@ else:
 			f.close()
 	                sys.exit()
 		if sys.argv[1] == "U":
-			print "printing U command"
+			print "writing U command"
 			f = open(dev, 'w')
 			f.write(sys.argv[1])
 			f.close()
@@ -87,7 +87,7 @@ x=conn.cursor()
 if ser:
 	while True:
 		output =  ser.readline()
-#		print output[:-2]
+		print output[:-2]
 		if output == "exit\r\n":
 #            		print "got exit command\n"
             		ser.close()

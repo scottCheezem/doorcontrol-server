@@ -12,20 +12,23 @@
     //or a 
 
 header("Content-type: text/json");
-    if(isset($_GET['c']) && preg_match('/^(t|u|U|l|L|q|Q){1}$/', $_GET['c']) ){
+`doorControl.py`;//start the daemon no matter what! if its already running, and doesn't com with a command it will just exit
+
+if(isset($_GET['c']) && preg_match('/^(t|u|U|l|L|q|Q){1}$/', $_GET['c']) ){
 
         $command = $_GET['c'];
 
         switch($command){
             case ('l'|'L'):
-		echo "LOCKING";
+		#echo "LOCKING";
                 `doorControl.py L`;
             break;
             case ('u'|'U'):
-		echo "UNLOCKING";
+		#echo "UNLOCKING";
                 `doorControl.py U`;
             break;
 	}
+	sleep(1);
         
 }
 
