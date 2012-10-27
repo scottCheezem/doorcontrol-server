@@ -12,45 +12,57 @@
     //or a 
 
 header("Content-type: text/json");
-`doorControl.py`;//start the daemon no matter what! if its already running, and doesn't com with a command it will just exit
-
-if(isset($_GET['c']) && preg_match('/^(t|u|U|l|L|q|Q){1}$/', $_GET['c']) ){
-
-        $command = $_GET['c'];
-
-        switch($command){
-            case ('l'|'L'):
-		#echo "LOCKING";
-                `doorControl.py L`;
-            break;
-            case ('u'|'U'):
-		#echo "UNLOCKING";
-                `doorControl.py U`;
-            break;
-	}
-	sleep(1);
-        
-}
-
-
-
-
-
-$con = mysql_connect("localhost", "devicemanager", "managedevice");    
+`doorControl.py`;//start the daemon no matter what! if its already running, and there is no argument, it will exit..
+    
+    
+$con = mysql_connect("localhost", "devicemanager", "managedevice");
 if(!$con){
-
-	die('Could not connect:'.mysql_error());
-
+    
+    die('Could not connect:'.mysql_error());
+    
 }elseif(mysql_select_db("pushdevices")){
+
+    if(isset($_POST['c']) && preg_match('/^(t|u|U|l|L|q|Q){1}$/', $_POST['c']) && isset($_POST['devToken'])){
+
+            $command = $_POST['c'];
+            $devToken = $_POST['devToken'];
+
+	//using devToken for now...
+	//this should be the authtoken...we'll do some processing on it here to authenticate it...        
+        
+            switch($command){
+                case ('l'|'L'):
+            #echo "LOCKING";
+                    `doorControl.py L $devToken`;
+                break;
+                case ('u'|'U'):
+            #echo "UNLOCKING";
+                    `doorControl.py U $devToken`;
+                break;
+        }
+        sleep(1);
+            
+    }
+
+
+
+//
+//
+//$con = mysql_connect("localhost", "devicemanager", "managedevice");
+//if(!$con){
+//
+//	die('Could not connect:'.mysql_error());
+//
+//}elseif(mysql_select_db("pushdevices")){
 
 	$result = mysql_query("SELECT * FROM Lock_State");
 	$row = mysql_fetch_array($result);
 	#echo $row['state'];
 
 	if($row['state'] == 0){
-		echo "{lockstate:false} \n";
+		echo "{\"lockstate\":\"false\"} \n";
 	}else{
-		echo "{lockstate:true} \n";
+		echo "{\"lockstate\":\"true\"} \n";
 	}
 
 }

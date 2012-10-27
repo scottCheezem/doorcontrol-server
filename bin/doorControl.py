@@ -9,7 +9,7 @@
 
 import serial
 import datetime
-import time
+#import time
 import sys
 import os
 import MySQLdb
@@ -39,8 +39,18 @@ print "how many? ",is_running()
 
 
 if(is_running() == 1):
-	print "first run. Daemonizing"	
+	print "first run. Daemonizing"
+
+	filename = '/home/doorcontrol/bin/fifo'
+	try:
+		os.mkfifo(filename)
+	except OSError, e:
+		print "failes to create FIFO %s" %e
+	#else:
+		#fifo = open(filename, 'w')
+	print filename	
 	pid = os.fork()
+	print "I am "+str(pid)
 	if pid > 0:
 		sys.exit(0)
 #	elif pid == 0:
@@ -51,29 +61,26 @@ if(is_running() == 1):
 
 
 else:
-	if len(sys.argv)>1:
+	print os.getpid()
+	if len(sys.argv)>2:
+		output = str(datetime.datetime.now()) + " - " + sys.argv[1] + " - " + sys.argv[2] + "\n"
+		print output
+		fifo = open('/home/doorcontrol/bin/fifo', 'w+')
+		fifo.write(sys.argv[2])
+		fifo.write("\n")
+		fifo.close()
 	        if sys.argv[1] == "L":
-	                print "writing L command"
 	                f = open(dev, 'w')
 	                f.write(sys.argv[1])
 	                f.close()
-			f = open("/home/doorcontrol/public_html/log", 'a')
-			f.write("Locking - ")
-			f.write(str(datetime.datetime.now()))
-			f.write("\n")
-			f.close()
-	                sys.exit()
 		if sys.argv[1] == "U":
-			print "writing U command"
 			f = open(dev, 'w')
 			f.write(sys.argv[1])
 			f.close()
-                        f = open("/home/doorcontrol/public_html/log", 'a')
-                        f.write("UNLocking ")
-			f.write(str(datetime.datetime.now()))
-			f.write("\n")
-			sys.exit()
-
+		f = open("/home/doorcontrol/public_html/log", 'a')
+		f.write(output)
+		f.close()
+		sys.exit()
 	exit()
 
 
@@ -81,19 +88,33 @@ else:
 
 ser = serial.Serial(dev, rate)
 
-conn = MySQLdb.connect("loaclhost", "devicemanager", "managedevice", "pushdevices")
+conn = MySQLdb.connect("localhost", "devicemanager", "managedevice", "pushdevices")
 x=conn.cursor()
+
+fifoIn = open('/home/doorcontrol/bin/fifo', 'r+')
+print "reading from serial"
 
 if ser:
 	while True:
 		output =  ser.readline()
+		token = fifoIn.readline()
+		#fifoIn.close()
+		print "token "+token
+		queryString = 'select devicename from IOSpushDevices where devicetoken = "'+ token[:-1]+'"'
+		print queryString
+		x.execute(queryString)
+
+		row = x.fetchone()
+		print row[0]
 		print output[:-2]
 		if output == "exit\r\n":
-#            		print "got exit command\n"
+            		print "got exit command\n"
             		ser.close()
             		conn.close()
+			fifoIn.close()
             		exit()
 		elif output == "lockState:true\r\n":
+			
             		x.execute("CALL ToggleLock('Main',1)")
             		conn.commit()
         	elif output == "lockState:false\r\n":
