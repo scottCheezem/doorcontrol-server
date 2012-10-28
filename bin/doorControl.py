@@ -29,7 +29,15 @@ def is_running():
 	return running
 
 
-
+def deviceLookUp(deviceToken):
+	print "token "+token
+	queryString = 'select devicename from IOSpushDevices where devicetoken = "'+ token[:-1]+'"'
+	x.execute(queryString)
+	row = x.fetchone()
+	devId = row[0]
+	print devId
+	return devId
+	
 
 print "how many? ",is_running()
 #exit()
@@ -53,6 +61,7 @@ if(is_running() == 1):
 	print "I am "+str(pid)
 	if pid > 0:
 		sys.exit(0)
+
 #	elif pid == 0:
 #		os.chdir("/")
 #		os.setsid()
@@ -97,26 +106,36 @@ print "reading from serial"
 if ser:
 	while True:
 		output =  ser.readline()
-		token = fifoIn.readline()
-		#fifoIn.close()
-		print "token "+token
-		queryString = 'select devicename from IOSpushDevices where devicetoken = "'+ token[:-1]+'"'
-		
-		x.execute(queryString)
-		row = x.fetchone()
-		devId = row[0]
+		#token = fifoIn.readline()
+		#token = ""
+		#if token != "":
+			
+		#else:
+		#	print "no token"
 		print output[:-2]
+
 		if output == "exit\r\n":
             		print "got exit command\n"
             		ser.close()
             		conn.close()
 			fifoIn.close()
             		exit()
+		elif output == "button:lockState:true\r\n":
+			token = "0001\n"
+			devId = deviceLookUp(token)
+            		x.execute("CALL ToggleLock('Main',1, '"+devId+"')")
+		elif output == "button:lockState:false\r\n":
+			token = "0001\n"
+			devId = deviceLookUp(token)
+            		x.execute("CALL ToggleLock('Main',0, '"+devId+"')")
 		elif output == "lockState:true\r\n":
-			
+			token = fifoIn.readline()
+			devId = deviceLookUp(token)
             		x.execute("CALL ToggleLock('Main',1, '"+devId+"')")
             		conn.commit()
         	elif output == "lockState:false\r\n":
+			token = fifoIn.readline()
+			devId = deviceLookUp(token)
             		x.execute("CALL ToggleLock('Main',0, '"+devId+"')")
             		conn.commit()
 		print "got here\n"
