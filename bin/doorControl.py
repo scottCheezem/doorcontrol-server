@@ -101,11 +101,10 @@ if ser:
 		#fifoIn.close()
 		print "token "+token
 		queryString = 'select devicename from IOSpushDevices where devicetoken = "'+ token[:-1]+'"'
-		print queryString
+		
 		x.execute(queryString)
-
 		row = x.fetchone()
-		print row[0]
+		devId = row[0]
 		print output[:-2]
 		if output == "exit\r\n":
             		print "got exit command\n"
@@ -115,11 +114,14 @@ if ser:
             		exit()
 		elif output == "lockState:true\r\n":
 			
-            		x.execute("CALL ToggleLock('Main',1)")
+            		x.execute("CALL ToggleLock('Main',1, '"+devId+"')")
             		conn.commit()
         	elif output == "lockState:false\r\n":
-            		x.execute("CALL ToggleLock('Main',0)")
+            		x.execute("CALL ToggleLock('Main',0, '"+devId+"')")
             		conn.commit()
+		print "got here\n"
+		for lines in os.popen("php /home/doorcontrol/public_html/SimplePush/foo.php"):
+			print lines
 else:
 	print "no serial, exiting"
 	conn.close()
