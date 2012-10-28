@@ -22,7 +22,8 @@ if(isset($_POST['appid']) && isset($_POST['devid']) && isValidUDID($_POST['devid
 
 	$devid = $_POST['devid'];
 	$appid = $_POST['appid'];
-    $devicename = $_POST['devname'];
+	$devicename = addslashes($_POST['devname']);//this needs to be scrubbed!!!
+		
 
 	$con = mysql_connect("localhost", "devicemanager", "managedevice");
 

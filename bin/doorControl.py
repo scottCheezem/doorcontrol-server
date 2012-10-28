@@ -30,14 +30,24 @@ def is_running():
 
 
 def deviceLookUp(deviceToken):
-	print "token "+token
-	queryString = 'select devicename from IOSpushDevices where devicetoken = "'+ token[:-1]+'"'
+	print "token "+deviceToken
+	#queryString = 'select devicename from IOSpushDevices where devicetoken = "'+ token[:-1]+'"'
+	queryString = """select devicename from IOSpushDevices where devicetoken = '%s'""" % deviceToken[:-1]
+	print queryString
 	x.execute(queryString)
-	row = x.fetchone()
-	devId = row[0]
-	print devId
-	return devId
-	
+	if x.rowcount > 0:
+		row = x.fetchone()
+		devId = row[0]
+		print devId
+		return devId
+
+		
+
+
+def log(output):
+	f = open("/home/doorcontrol/public_html/log", 'a')
+	f.write(output)
+	f.close()
 
 print "how many? ",is_running()
 #exit()
@@ -86,9 +96,7 @@ else:
 			f = open(dev, 'w')
 			f.write(sys.argv[1])
 			f.close()
-		f = open("/home/doorcontrol/public_html/log", 'a')
-		f.write(output)
-		f.close()
+		log(output)
 		sys.exit()
 	exit()
 
@@ -124,19 +132,25 @@ if ser:
 			token = "0001\n"
 			devId = deviceLookUp(token)
             		x.execute("CALL ToggleLock('Main',1, '"+devId+"')")
+			output = str(datetime.datetime.now()) + " - L - " + token + "\n"
+			log(output)
 		elif output == "button:lockState:false\r\n":
 			token = "0001\n"
 			devId = deviceLookUp(token)
             		x.execute("CALL ToggleLock('Main',0, '"+devId+"')")
+			output = str(datetime.datetime.now()) + " - U - " + token + "\n"
+			log(output)
 		elif output == "lockState:true\r\n":
 			token = fifoIn.readline()
 			devId = deviceLookUp(token)
-            		x.execute("CALL ToggleLock('Main',1, '"+devId+"')")
+			querystring = """CALL ToggleLock('Main',1, "%s")""" 
+            		x.execute(querystring, devId)
             		conn.commit()
         	elif output == "lockState:false\r\n":
 			token = fifoIn.readline()
 			devId = deviceLookUp(token)
-            		x.execute("CALL ToggleLock('Main',0, '"+devId+"')")
+			querystring = """CALL ToggleLock('Main',0, "%s")"""
+            		x.execute(querystring, devId)
             		conn.commit()
 		print "got here\n"
 		for lines in os.popen("php /home/doorcontrol/public_html/SimplePush/foo.php"):
