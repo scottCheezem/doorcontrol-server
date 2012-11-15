@@ -14,7 +14,7 @@ import sys
 import os
 import MySQLdb
 
-dev = '/dev/ttyUSB1'
+dev = '/dev/ttyUSB0'
 rate = 9600
 
 def is_running():
@@ -114,12 +114,7 @@ print "reading from serial"
 if ser:
 	while True:
 		output =  ser.readline()
-		#token = fifoIn.readline()
-		#token = ""
-		#if token != "":
-			
-		#else:
-		#	print "no token"
+
 		print output[:-2]
 
 		if output == "exit\r\n":
@@ -152,7 +147,6 @@ if ser:
 			querystring = """CALL ToggleLock('Main',0, "%s")"""
             		x.execute(querystring, devId)
             		conn.commit()
-		print "got here\n"
 		for lines in os.popen("php /home/doorcontrol/public_html/SimplePush/foo.php"):
 			print lines
 else:
