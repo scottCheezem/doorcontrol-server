@@ -30,15 +30,15 @@ def is_running():
 
 
 def deviceLookUp(deviceToken):
-	print "token "+deviceToken
+	log("token "+deviceToken)
 	#queryString = 'select devicename from IOSpushDevices where devicetoken = "'+ token[:-1]+'"'
 	queryString = """select devicename from IOSpushDevices where devicetoken = '%s'""" % deviceToken[:-1]
-	print queryString
+	log(queryString)
 	x.execute(queryString)
 	if x.rowcount > 0:
 		row = x.fetchone()
 		devId = row[0]
-		print devId
+		#print devId
 		return devId
 
 		
@@ -57,33 +57,30 @@ print "how many? ",is_running()
 
 
 if(is_running() == 1):
-	print "first run. Daemonizing"
+	log("first run. Daemonizing\n")
 
 	filename = '/home/doorcontrol/bin/fifo'
 	try:
 		os.mkfifo(filename)
 	except OSError, e:
-		print "failes to create FIFO %s" %e
+		log("failes to create FIFO %s" %e)
 	#else:
 		#fifo = open(filename, 'w')
-	print filename	
+	#print filename	
 	pid = os.fork()
-	print "I am "+str(pid)
+	log("I am "+str(pid)+"\n")
 	if pid > 0:
 		sys.exit(0)
 
-#	elif pid == 0:
-#		os.chdir("/")
-#		os.setsid()
-#		os.umask(0)
-
+	elif pid == 0:
+		os.setsid()
 
 
 else:
-	print os.getpid()
+	log(str(os.getpid())+"\n")
 	if len(sys.argv)>2:
 		output = str(datetime.datetime.now()) + " - " + sys.argv[1] + " - " + sys.argv[2] + "\n"
-		print output
+		log(output+"\n")
 		fifo = open('/home/doorcontrol/bin/fifo', 'w+')
 		fifo.write(sys.argv[2])
 		fifo.write("\n")
@@ -109,16 +106,16 @@ conn = MySQLdb.connect("localhost", "devicemanager", "managedevice", "pushdevice
 x=conn.cursor()
 
 fifoIn = open('/home/doorcontrol/bin/fifo', 'r+')
-print "reading from serial"
+log("reading from serial\n")
 
 if ser:
 	while True:
 		output =  ser.readline()
 
-		print output[:-2]
+		log(output[:-2]+"\n")
 
 		if output == "exit\r\n":
-            		print "got exit command\n"
+            		log("got exit command\n")
             		ser.close()
             		conn.close()
 			fifoIn.close()
@@ -147,8 +144,8 @@ if ser:
 			querystring = """CALL ToggleLock('Main',0, "%s")"""
             		x.execute(querystring, devId)
             		conn.commit()
-		for lines in os.popen("php /home/doorcontrol/public_html/SimplePush/foo.php"):
-			print lines
+		for lines in os.popen("php /home/doorcontrol/public_html/notify.php"):
+			log(lines)
 else:
 	print "no serial, exiting"
 	conn.close()
