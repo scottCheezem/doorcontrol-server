@@ -34,7 +34,7 @@
                   
                   for (device in devices){
                   
-                  $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceType">'+devices[device].devicetype+'</td><td class="deviceName">'+devices[device].devicename+'</td><td><img src="images/trash.png" class="deleteButton"/></td><td><button type="button" class="authButton">Authorize</button></td></tr>');
+                  $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceName">'+devices[device].devicename+'</td><td class="'+devices[device].devicetype+'"></td><td><img src="images/trash.png" class="deleteButton"/></td><td><img src="images/houseKey.png" class="authButton"/></td></tr>');
                   }
                   
                   
@@ -103,11 +103,12 @@
     
     .deviceName{color:white;}
     
-    .deviceType{background-image:url('images/iphoneDevice.png');}
+    .iPhone{width:84;height:84;content:url('images/iphoneDevice.png');}
+    .iPad{width:84;height:84;content:url('images/ipadDevice.png');}
     
     .deleteButton{width:64;height:64;}
     
-    .authButton{}
+    .authButton{width:64;height:64;}
     
     
 </style>
