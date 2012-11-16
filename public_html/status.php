@@ -12,7 +12,7 @@
     //or a 
 
 header("Content-type: text/json");
-`doorControl.py 2>/dev/null`;//start the daemon no matter what! if its already running, and there is no argument, it will exit..
+`doorControl.py`;//start the daemon no matter what! if its already running, and there is no argument, it will exit..
     
     
 $con = mysql_connect("localhost", "devicemanager", "managedevice");

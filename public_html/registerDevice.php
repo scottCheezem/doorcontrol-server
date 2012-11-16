@@ -23,7 +23,7 @@ if(isset($_POST['appid']) && isset($_POST['devid']) && isValidUDID($_POST['devid
 	$devid = $_POST['devid'];
 	$appid = $_POST['appid'];
 	$devicename = addslashes($_POST['devname']);//this needs to be scrubbed!!!
-		
+	$devicetype = $_POST['devtype'];
 
 	$con = mysql_connect("localhost", "devicemanager", "managedevice");
 
@@ -39,7 +39,7 @@ if(isset($_POST['appid']) && isset($_POST['devid']) && isValidUDID($_POST['devid
 		if($numRows == 0 ){
             		//this particular combination is not in the db...
             		echo "inserting...\n";
-            		$insertNewDeviceId = 'insert into IOSpushDevices (devicetoken, appid, devicename) VALUES("'.$devid.'", "'.$appid.'", "'.$devicename.'")';
+            		$insertNewDeviceId = 'insert into IOSpushDevices (devicetoken, appid, devicename, devicetype) VALUES("'.$devid.'", "'.$appid.'", "'.$devicename.'", "'.$devicetype.'")';
             		echo $insertNewDeviceId."\n";
             		$query = mysql_query($insertNewDeviceId, $con);
                 }

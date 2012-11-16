@@ -1,0 +1,125 @@
+<html>
+<head>
+<title>Door Control</title>
+    <script type="text/javascript">
+        
+        function staticLoadScript(url)
+        {
+            document.write('<script src="', url, '" type="text/JavaScript"><\/script>');
+        }
+        if (typeof jQuery == 'undefined'){
+            //staticLoadScript("http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js");
+            staticLoadScript("http://code.jquery.com/jquery-latest.min.js");
+            
+            
+            
+            
+        }
+        </script>
+
+
+
+<!--do some css stuff here for fun if time-->
+
+<script type="text/javascript">
+
+    $.ajax({cache:false});
+    
+    function getDeviceList(){
+        //do a post get back JSON, generate rows.
+        $('#deviceTable').html('');
+        $.getJSON("deviceList.php", function(deviceData){
+                  console.log('getting devices');
+                  devices = deviceData.devices;
+                  
+                  for (device in devices){
+                  
+                  $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceType">'+devices[device].devicetype+'</td><td class="deviceName">'+devices[device].devicename+'</td><td><img src="images/trash.png" class="deleteButton"/></td><td><button type="button" class="authButton">Authorize</button></td></tr>');
+                  }
+                  
+                  
+                  });
+        
+        
+    }
+    
+
+    function deleteDevice(id){
+        
+        $.post("deleteDevice.php", {"id" : id}, function(data){
+               console.log(data);
+               getDeviceList();
+               });
+        
+        
+    }
+    function authorizeDevice(id){
+
+        
+        
+    }
+    
+    
+
+    $(document).ready(function(){
+                      
+                      getDeviceList();
+                      
+                      $('.deleteButton').live('click', function(){
+                           pid=$(this).parent().parent().find('input').val();
+                                              console.log("want to delete "+pid);
+                                              deleteDevice(pid);
+                            
+                       })
+                      
+                      
+                      
+                      $('.authorizeDevice').live('click', function(){
+                           pid=$(this).parent().parent().find('input').val();
+                                                 console.log("want to authorize "+pid);
+                                                 
+                                                 });
+                      
+    })
+
+    
+
+
+
+
+
+</script>
+<style type="text/css">
+    
+    *{font-family:"Arial";}
+    
+    
+    
+    
+    body{background-image:url('images/bg.jpeg');
+        background-repeat-x;
+    }
+    
+    
+    .deviceName{color:white;}
+    
+    .deviceType{background-image:url('images/iphoneDevice.png');}
+    
+    .deleteButton{width:64;height:64;}
+    
+    .authButton{}
+    
+    
+</style>
+
+</head>
+
+<body>
+<table id="deviceTable">
+    
+    
+</table>
+    
+
+</body>
+</html>
