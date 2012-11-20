@@ -28,7 +28,14 @@ if(!$con){
             $devToken = $_POST['devToken'];
 
 	//using devToken for now...
-	//this should be the authtoken...we'll do some processing on it here to authenticate it...        
+	//this should be the authtoken...we'll do some processing on it here to authenticate it...
+        //don't forget to check the start and end times to make sure that
+        $authQuery = 'select deviceToken from IOSpushDevices,AuthorizedDevices where A_ID=P_ID and deviceToken="'.$deviceToken.'"';
+        $authResult = mysql_query($authQuery);
+        $authRows = mysql_fetch_array($authReult);
+        $authRowCount = mysql_num_rows($authRows);
+        
+        if(authRowCount >= 1){
         
             switch($command){
                 case ('l'|'L'):
@@ -39,6 +46,7 @@ if(!$con){
             #echo "UNLOCKING";
                     `doorControl.py U $devToken`;
                 break;
+        }
         }
         sleep(1);
             

@@ -34,7 +34,7 @@ if(isset($_POST['appid']) && isset($_POST['devid']) && isValidUDID($_POST['devid
 		//add the deviceid to the table
        	 	$idcheck = 'select COUNT(*) from IOSpushDevices where devicetoken = "'.$devid.'" and appid = "'.$appid.'"';
         	$query = mysql_query($idcheck);
-        	$numRows = mysql_num_rows($query, $con);
+        	$numRows = mysql_num_rows($query);
         	echo "ran ". $idcheck  . " got ".$numRows ."\n";
 		if($numRows == 0 ){
             		//this particular combination is not in the db...
