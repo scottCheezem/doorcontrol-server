@@ -144,7 +144,7 @@ if ser:
 			querystring = """CALL ToggleLock('Main',0, "%s")"""
             		x.execute(querystring, devId)
             		conn.commit()
-		for lines in os.popen("php /home/doorcontrol/public_html/notify.php"):
+		for lines in os.popen("php /home/doorcontrol/public_html/admin/notify.php"):
 			log(lines)
 else:
 	print "no serial, exiting"

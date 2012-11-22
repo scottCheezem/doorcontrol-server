@@ -9,13 +9,17 @@
     if(!$con){
         die('Could not connect:'.mysql_error());
     }elseif(mysql_select_db("pushdevices")){
-        $result = mysql_query("SELECT * FROM IOSpushDevices where appid='net.theroyalwe.doorcontrol'");
-
+        //select * from (select * from IOSpushDevices where appid='net.theroyalwe.doorcontrol') as i LEFT OUTER JOIN AuthorizedDevices as a on a.A_ID=i.P_ID
+//        $result = mysql_query("SELECT * FROM IOSpushDevices where appid='net.theroyalwe.doorcontrol'");
+        $result = mysql_query("select * from (select * from IOSpushDevices where appid='net.theroyalwe.doorcontrol') as i LEFT OUTER JOIN AuthorizedDevices as a on a.A_ID=i.P_ID");
         $devices=array();
         
         
         while($row = mysql_fetch_array($result)){
             $device=array("pid" => $row['P_ID'],
+                          "aid" =>$row['A_ID'],
+                          "startTime" => $row['StartTime'],
+                          "endTime" => $row['EndTime'],
                           "devicetoken" => $row['devicetoken'],
                           "devicename"=> $row['devicename'],
                           "registertime"=>$row['registertime'],

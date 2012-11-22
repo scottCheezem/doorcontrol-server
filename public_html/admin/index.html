@@ -34,7 +34,13 @@ function getDeviceList(){
 
         for (device in devices){
 
-        $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceName">'+devices[device].devicename+'</td><td class="'+devices[device].devicetype+'"></td><td><img src="images/trash.png" class="deleteButton"/></td><td><img src="images/houseKey.png" class="authButton"/></td></tr>');
+              console.log(devices[device].aid);
+            if(devices[device].aid == devices[device].pid){
+              $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceName">'+devices[device].devicename+'</td><td class="'+devices[device].devicetype+'"></td><td> <span class="button red deleteButton">Delete</span></td><td><span class="button gold deauthButton">DeAuthorize</span></td></tr>');
+              
+            }else{
+                $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceName">'+devices[device].devicename+'</td><td class="'+devices[device].devicetype+'"></td><td> <span class="button red deleteButton">Delete</span></td><td><span class="button green authButton">Authorize</span></td></tr>');
+            }
         }
     });
 }
@@ -50,12 +56,23 @@ function deleteDevice(id){
 
 }
 function authorizeDevice(id){
-    $.post("notify.php", {"auth" : id}, function(data){
+    $.post("authorizeDevice.php", {"authid" : id}, function(data){
+           
         console.log(data);
+        getDeviceList();
 
     });
 }
+function deauthorizeDevice(id){
+    $.post("authorizeDevice.php", {"deauthid" : id}, function(data){
+           
+           console.log(data);
+           getDeviceList();
+           
+   });
+}
 
+    
 
 
 $(document).ready(function(){
@@ -63,6 +80,7 @@ $(document).ready(function(){
     getDeviceList();
 
     $('.deleteButton').live('click', function(){
+                            console.log('you clikced');
         pid=$(this).parent().parent().find('input').val();
         console.log("want to delete "+pid);
         deleteDevice(pid);
@@ -73,6 +91,12 @@ $(document).ready(function(){
         pid=$(this).parent().parent().find('input').val();
         console.log("want to authorize "+pid);
         authorizeDevice(pid);
+    });
+
+    $('.deauthButton').live('click', function(){
+        pid=$(this).parent().parent().find('input').val();
+        console.log("want to deauthorize "+pid);
+        deauthorizeDevice(pid);
     });
 
 });
@@ -101,11 +125,66 @@ background-repeat-x;
 .iPhone{width:84;height:84;content:url('images/iphoneDevice.png');}
 .iPad{width:84;height:84;content:url('images/ipadDevice.png');}
 
-.deleteButton{width:64;height:64;}
+/*.deleteButton{width:64;height:64;}
 
-.authButton{width:64;height:64;}
+.authButton{width:64;height:64;}*/
 
-
+    /* Green Button */
+    .button.green {
+        display: inline-block;
+        -webkit-border-radius: 12px;
+        -webkit-box-shadow: 2px 2px 3px #999;
+        border: solid 3px rgb(110,110,110);
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(115,239,115,0.70)), color-stop(0.5, rgba(73,171,14,0.60)), color-stop(0.5, rgba(0,113,0,0.70)), to(rgba(0,150,0,0.80)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        font: bold 16px/20px Helvetica, Sans-serif;
+        padding: 9px 11px;
+    }
+    .button.green:hover, .button.white.hover {
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(135,148,203,0.85)), color-stop(0.5, rgba(34,56,159,0.75)), color-stop(0.5, rgba(0,27,145,0.75)), to(rgba(2,59,152,0.65)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        -webkit-box-shadow: inset rgba(207,207,255,0.75) 0px 1px 1px;
+    }
+    
+    /* Red Button */
+    .button.red {
+        display: inline-block;
+        -webkit-border-radius: 12px;
+        -webkit-box-shadow: 2px 2px 3px #999;
+        border: solid 3px rgb(110,110,110);
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255,59,59,0.70)), color-stop(0.5, rgba(233,72,72,0.80)), color-stop(0.5, rgba(184,0,0,0.70)), to(rgba(255,0,0,0.80)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        font: bold 16px/20px Helvetica, Sans-serif;
+        padding: 9px 11px;
+    }
+    .button.red:hover, .button.white.hover {
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(135,148,203,0.85)), color-stop(0.5, rgba(34,56,159,0.75)), color-stop(0.5, rgba(0,27,145,0.75)), to(rgba(2,59,152,0.65)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        -webkit-box-shadow: inset rgba(207,207,255,0.75) 0px 1px 1px;
+    }
+    /* Gold Button */
+    .button.gold {
+        display: inline-block;
+        -webkit-border-radius: 12px;
+        -webkit-box-shadow: 2px 2px 3px #999;
+        border: solid 3px rgb(110,110,110);
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255,217,0,0.90)), color-stop(0.5, rgba(255,185,0,0.70)), color-stop(0.5, rgba(255,138,0,0.70)), to(rgba(255,165,0,0.80)));
+        color: #000;
+        text-shadow: #fff 0 1px 0;
+        font: bold 16px/20px Helvetica, Sans-serif;
+        padding: 9px 11px;
+    }
+    .button.gold:hover, .button.white.hover {
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(135,148,203,0.85)), color-stop(0.5, rgba(34,56,159,0.75)), color-stop(0.5, rgba(0,27,145,0.75)), to(rgba(2,59,152,0.65)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        -webkit-box-shadow: inset rgba(207,207,255,0.75) 0px 1px 1px;
+    }
+    
 </style>
 
 </head>

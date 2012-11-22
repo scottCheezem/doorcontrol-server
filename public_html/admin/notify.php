@@ -33,24 +33,7 @@ mysql_close($con);
     
     function sendAuth($id){
 
-/*        an auth push looks like what?
- 
- 
- 
- {aps:{alert:your device has been authorized for xh xm xs or til xxx
-    sound...
- },
- extra:{
- starttime:
- endtime: //calculate a timer on the devicee for user feed back
- authorized:true?or like a url or something...
- }
- }
- 
- 
- */
- 
- 
+
         
         $authQuery = 'select deviceToken from IOSpushDevices where appid="net.theroyalwe.doorControl" and P_ID='.id;
         $query = mysql_query($authQuery);

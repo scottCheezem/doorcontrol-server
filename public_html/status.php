@@ -30,12 +30,12 @@ if(!$con){
 	//using devToken for now...
 	//this should be the authtoken...we'll do some processing on it here to authenticate it...
         //don't forget to check the start and end times to make sure that
-        $authQuery = 'select deviceToken from IOSpushDevices,AuthorizedDevices where A_ID=P_ID and deviceToken="'.$deviceToken.'"';
+        $authQuery = 'select COUNT(deviceToken) as total from IOSpushDevices,AuthorizedDevices where A_ID=P_ID and deviceToken="'.$devToken.'"';
         $authResult = mysql_query($authQuery);
-        $authRows = mysql_fetch_array($authReult);
-        $authRowCount = mysql_num_rows($authRows);
+        $authRows = mysql_fetch_array($authResult);
         
-        if(authRowCount >= 1){
+        
+        if($authRows['total'] >= 1){
         
             switch($command){
                 case ('l'|'L'):
@@ -46,7 +46,7 @@ if(!$con){
             #echo "UNLOCKING";
                     `doorControl.py U $devToken`;
                 break;
-        }
+            }
         }
         sleep(1);
             
@@ -54,18 +54,9 @@ if(!$con){
 
 
 
-//
-//
-//$con = mysql_connect("localhost", "devicemanager", "managedevice");
-//if(!$con){
-//
-//	die('Could not connect:'.mysql_error());
-//
-//}elseif(mysql_select_db("pushdevices")){
-
 	$result = mysql_query("SELECT * FROM Lock_State");
 	$row = mysql_fetch_array($result);
-	#echo $row['state'];
+
 
 	if($row['state'] == 0){
 		echo "{\"lockstate\":\"false\"} \n";
