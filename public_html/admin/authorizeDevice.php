@@ -17,7 +17,21 @@
             //remove the A_ID from list...
             $deauthId = $_POST['deauthid'];
             $deauthQuery = 'delete from AuthorizedDevices where A_ID="'.$deauthId.'"';
-            $quaery = mysql_query($deauthQuery);
+            $query = mysql_query($deauthQuery);
+            
+            
+        }else if(isset($_POST['makeowner'])){
+            //remove the A_ID from list...
+            $authId = $_POST['makeowner'];
+            $ownerQuery = 'update AuthorizedDevices set isOwner = 1 where A_ID="'.$authId.'"';
+            $query = mysql_query($ownerQuery);
+            
+            
+        }else if(isset($_POST['takeowner'])){
+            //remove the A_ID from list...
+            $deauthId = $_POST['takeowner'];
+            $deauthQuery = 'update AuthorizedDevices set isOwner = 0 where A_ID="'.$deauthId.'"';
+            $query = mysql_query($deauthQuery);
             
             
         }

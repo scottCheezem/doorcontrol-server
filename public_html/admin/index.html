@@ -34,10 +34,14 @@ function getDeviceList(){
 
         for (device in devices){
 
-              console.log(devices[device].aid);
+              console.log(devices[device].isOwner);
             if(devices[device].aid == devices[device].pid){
-              $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceName">'+devices[device].devicename+'</td><td class="'+devices[device].devicetype+'"></td><td> <span class="button red deleteButton">Delete</span></td><td><span class="button gold deauthButton">DeAuthorize</span></td></tr>');
+              if(devices[device].isOwner){
+              $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceName">'+devices[device].devicename+'</td><td class="'+devices[device].devicetype+'"></td><td> <span class="button red deleteButton">Delete</span></td><td><span class="button blue deauthButton">DeAuthorize</span></td><td><span class="button white takeOwner">Take OwnerShip</span></td></tr>');
               
+              }else{
+              $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceName">'+devices[device].devicename+'</td><td class="'+devices[device].devicetype+'"></td><td> <span class="button red deleteButton">Delete</span></td><td><span class="button blue deauthButton">DeAuthorize</span></td><td><span class="button gold makeOwner">Make Owner Device</span></td></tr>');
+              }
             }else{
                 $('#deviceTable').append('<tr class="deviceRow"><td><input name="pid" type="hidden" value="'+devices[device].pid+'"/></td><td class="deviceName">'+devices[device].devicename+'</td><td class="'+devices[device].devicetype+'"></td><td> <span class="button red deleteButton">Delete</span></td><td><span class="button green authButton">Authorize</span></td></tr>');
             }
@@ -72,7 +76,24 @@ function deauthorizeDevice(id){
    });
 }
 
-    
+    function makeOwnerDevice(id){
+        $.post("authorizeDevice.php", {"makeowner" : id}, function(data){
+               
+               console.log(data);
+               getDeviceList();
+               
+       });
+
+    }
+    function takeOwnerDevice(id){
+        $.post("authorizeDevice.php", {"takeowner" : id}, function(data){
+               
+               console.log(data);
+               getDeviceList();
+               
+               });
+        
+    }
 
 
 $(document).ready(function(){
@@ -98,6 +119,20 @@ $(document).ready(function(){
         console.log("want to deauthorize "+pid);
         deauthorizeDevice(pid);
     });
+                  
+    $('.makeOwner').live('click', function(){
+        pid=$(this).parent().parent().find('input').val();
+        console.log("want to make owner "+pid);
+        makeOwnerDevice(pid);
+
+    });
+    $('.takeOwner').live('click', function(){
+        pid=$(this).parent().parent().find('input').val();
+        console.log("want to take owner "+pid);
+        takeOwnerDevice(pid);
+
+    });
+
 
 });
 
@@ -179,6 +214,61 @@ background-repeat-x;
         padding: 9px 11px;
     }
     .button.gold:hover, .button.white.hover {
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(135,148,203,0.85)), color-stop(0.5, rgba(34,56,159,0.75)), color-stop(0.5, rgba(0,27,145,0.75)), to(rgba(2,59,152,0.65)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        -webkit-box-shadow: inset rgba(207,207,255,0.75) 0px 1px 1px;
+    }
+    /* White Button */
+    .button.white {
+        display: inline-block;
+        -webkit-border-radius: 12px;
+        -webkit-box-shadow: 2px 2px 3px #999;
+        border: solid 3px rgb(110,110,110);
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(234,234,234,0.90)), color-stop(0.5, rgba(195,195,195,0.70)), color-stop(0.5, rgba(166,166,166,0.70)), to(rgba(167,167,167,0.80)));
+        color: #000;
+        text-shadow: #fff 0 1px 0;
+        font: bold 16px/20px Helvetica, Sans-serif;
+        padding: 9px 11px;
+    }
+    .button.white:hover, .button.white.hover {
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(135,148,203,0.85)), color-stop(0.5, rgba(34,56,159,0.75)), color-stop(0.5, rgba(0,27,145,0.75)), to(rgba(2,59,152,0.65)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        -webkit-box-shadow: inset rgba(207,207,255,0.75) 0px 1px 1px;
+    }
+    /* Black Button */
+    
+    .button.black {
+        display: inline-block;
+        -webkit-border-radius: 12px;
+        -webkit-box-shadow: 2px 2px 3px #999;
+        border: solid 3px rgb(110,110,110);
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(74,74,74,0.85)), color-stop(0.5, rgba(20,20,20,0.75)), color-stop(0.5, rgba(2,2,2,0.75)), to(rgba(14,14,14,0.75)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        font: bold 16px/20px Helvetica, Sans-serif;
+        padding: 9px 11px;
+    }
+    .button.black:hover, .button.black.hover {
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(135,148,203,0.85)), color-stop(0.5, rgba(34,56,159,0.75)), color-stop(0.5, rgba(0,27,145,0.75)), to(rgba(2,59,152,0.65)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        -webkit-box-shadow: inset rgba(207,207,255,0.75) 0px 1px 1px;
+    }
+    /* Blue Button */
+    .button.blue {
+        display: inline-block;
+        -webkit-border-radius: 12px;
+        -webkit-box-shadow: 2px 2px 3px #999;
+        border: solid 3px rgb(110,110,110);
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(86,213,255,0.90)), color-stop(0.5, rgba(59,145,255,0.70)), color-stop(0.5, rgba(0,114,255,0.70)), to(rgba(0,133,255,0.80)));
+        color: #fff;
+        text-shadow: #000 0 1px 0;
+        font: bold 16px/20px Helvetica, Sans-serif;
+        padding: 9px 11px;
+    }
+    .button.blue:hover, .button.white.hover {
         background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(135,148,203,0.85)), color-stop(0.5, rgba(34,56,159,0.75)), color-stop(0.5, rgba(0,27,145,0.75)), to(rgba(2,59,152,0.65)));
         color: #fff;
         text-shadow: #000 0 1px 0;

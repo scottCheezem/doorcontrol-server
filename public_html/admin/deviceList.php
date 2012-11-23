@@ -18,6 +18,7 @@
         while($row = mysql_fetch_array($result)){
             $device=array("pid" => $row['P_ID'],
                           "aid" =>$row['A_ID'],
+                          "isOwner"=>(($row['isOwner']==0)?false:true),
                           "startTime" => $row['StartTime'],
                           "endTime" => $row['EndTime'],
                           "devicetoken" => $row['devicetoken'],
