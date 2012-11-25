@@ -19,7 +19,7 @@
     
 header("Content-type: text/json");
 `doorControl.py`;//start the daemon no matter what! if its already running, and there is no argument, it will exit..
-
+$output = array();
     
 $con = mysql_connect("localhost", "devicemanager", "managedevice");
 if(!$con){
@@ -60,7 +60,7 @@ if(!$con){
         }
         
         
-        $output = array();
+
         $result = mysql_query("SELECT * FROM Lock_State");
         $locked = mysql_fetch_array($result);
         $lockedState = (($locked['state']==0)?"false":"true");
@@ -75,9 +75,12 @@ if(!$con){
         $output['isAuthed'] = (($privs['A_ID'] == $privs['P_ID'])?"true":"false");
         $output['isOwner'] = (($privs['isOwner'] == 1)?"true":"false");
         
-        echo json_encode($output);
+        
+        }else{
+            $output['isAuthed']="false";
         }
         
+        echo json_encode($output);
     }
 
        
