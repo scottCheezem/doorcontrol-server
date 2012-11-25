@@ -65,6 +65,8 @@ function authorizeDevice(id){
         console.log(data);
         getDeviceList();
 
+        $.post("notify.php", {"auth":id});
+
     });
 }
 function deauthorizeDevice(id){
@@ -72,28 +74,28 @@ function deauthorizeDevice(id){
            
            console.log(data);
            getDeviceList();
-           
+           $.post("notify.php", {"deauth":id});
    });
 }
 
-    function makeOwnerDevice(id){
-        $.post("authorizeDevice.php", {"makeowner" : id}, function(data){
-               
-               console.log(data);
-               getDeviceList();
-               
-       });
+function makeOwnerDevice(id){
+    $.post("authorizeDevice.php", {"makeowner" : id}, function(data){
+           
+           console.log(data);
+           getDeviceList();
+           
+   });
 
-    }
-    function takeOwnerDevice(id){
-        $.post("authorizeDevice.php", {"takeowner" : id}, function(data){
-               
-               console.log(data);
-               getDeviceList();
-               
-               });
-        
-    }
+}
+function takeOwnerDevice(id){
+    $.post("authorizeDevice.php", {"takeowner" : id}, function(data){
+           
+           console.log(data);
+           getDeviceList();
+           
+           });
+    
+}
 
 
 $(document).ready(function(){
@@ -101,7 +103,6 @@ $(document).ready(function(){
     getDeviceList();
 
     $('.deleteButton').live('click', function(){
-                            console.log('you clikced');
         pid=$(this).parent().parent().find('input').val();
         console.log("want to delete "+pid);
         deleteDevice(pid);

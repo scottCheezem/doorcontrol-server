@@ -13,6 +13,8 @@
             $authId = $_POST['authid'];
             $authQuery = 'insert into AuthorizedDevices (A_ID) VALUES("'.$authId.'")';
             $query = mysql_query($authQuery);
+                        
+            
         }else if(isset($_POST['deauthid'])){
             //remove the A_ID from list...
             $deauthId = $_POST['deauthid'];

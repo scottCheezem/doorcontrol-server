@@ -17,6 +17,9 @@ if(!$con){
         $aid = $_POST['auth'];
         sendAuth($aid);
         
+    }else if(isset($_POST['deauth'])){
+        $did = $_POST['deauth'];
+        sendDeAuth($did);
     }else{
         notifyState();
     }
@@ -35,14 +38,14 @@ mysql_close($con);
 
 
         
-        $authQuery = 'select deviceToken from IOSpushDevices where appid="net.theroyalwe.doorControl" and P_ID='.id;
+        $authQuery = 'select deviceToken,StartTime,EndTime from IOSpushDevices,AuthorizedDevices where appid="net.theroyalwe.doorControl" and A_ID=P_ID and P_ID='.$id;
         $query = mysql_query($authQuery);
         $row = mysql_fetch_array($query);
         $deviceToken = $row['deviceToken'];
         
         //remember, this is to auth a device, not invite it! well do that later...
         $message='This device has been authorized.';
-        $extra=array("starttime"=>$row['StartTime'],"endtime"=>$row['EndTime']);
+        $extra=array("isAuthed"=>"true","starttime"=>$row['StartTime'],"endtime"=>$row['EndTime']);
         
 
         
@@ -53,6 +56,31 @@ mysql_close($con);
         
         
     }
+    
+    
+    function sendDeAuth($id){
+        
+        
+        
+        $authQuery = 'select deviceToken from IOSpushDevices where appid="net.theroyalwe.doorControl" and P_ID='.$id;
+        $query = mysql_query($authQuery);
+        $row = mysql_fetch_array($query);
+        $deviceToken = $row['deviceToken'];
+        
+        //remember, this is to auth a device, not invite it! well do that later...
+        $message='This device is no longer authorized.';
+        $extra=array("isAuthed"=>"false");
+        
+        
+        
+        $fp=openConnection();
+        apns($deviceToken, $message, $extra, $fp);//my message!!!
+        closeConnection($fp);
+        
+        
+        
+    }
+    
     
     function notifyState(){
         
@@ -77,7 +105,7 @@ mysql_close($con);
         
         $extra = array('lockstate'=>$lockState, 'device'=>$device);
         
-        $recipients = 'select deviceToken from IOSpushDevices where appid = "net.theroyalwe.doorControl"';
+        $recipients = 'select deviceToken from IOSpushDevices,AuthorizedDevices where appid="net.theroyalwe.doorcontrol" and P_ID=A_ID';
         $query = mysql_query($recipients);
         
         
