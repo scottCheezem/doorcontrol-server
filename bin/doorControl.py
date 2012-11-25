@@ -14,8 +14,12 @@ import sys
 import os
 import MySQLdb
 
-dev = '/dev/ttyUSB0'
+dev = '/dev/ttyUSB1'
 rate = 9600
+
+homedir = '/home/doorcontrol/'
+fifoFile = homedir + "bin/fifo"
+
 
 def is_running():
 	running = 0;
@@ -45,7 +49,7 @@ def deviceLookUp(deviceToken):
 
 
 def log(output):
-	f = open("/home/doorcontrol/public_html/log", 'a')
+	f = open(homedir + "/public_html/log", 'a')
 	f.write(output)
 	f.close()
 
@@ -59,7 +63,7 @@ print "how many? ",is_running()
 if(is_running() == 1):
 	log("first run. Daemonizing\n")
 
-	filename = '/home/doorcontrol/bin/fifo'
+	filename = fifoFile
 	try:
 		os.mkfifo(filename)
 	except OSError, e:
@@ -81,7 +85,7 @@ else:
 	if len(sys.argv)>2:
 		output = str(datetime.datetime.now()) + " - " + sys.argv[1] + " - " + sys.argv[2] + "\n"
 		log(output+"\n")
-		fifo = open('/home/doorcontrol/bin/fifo', 'w+')
+		fifo = open(fifoFile, 'w+')
 		fifo.write(sys.argv[2])
 		fifo.write("\n")
 		fifo.close()
@@ -105,7 +109,7 @@ ser = serial.Serial(dev, rate)
 conn = MySQLdb.connect("localhost", "devicemanager", "managedevice", "pushdevices")
 x=conn.cursor()
 
-fifoIn = open('/home/doorcontrol/bin/fifo', 'r+')
+fifoIn = open(fifoFile, 'r+')
 log("reading from serial\n")
 
 if ser:
@@ -144,7 +148,7 @@ if ser:
 			querystring = """CALL ToggleLock('Main',0, "%s")"""
             		x.execute(querystring, devId)
             		conn.commit()
-		for lines in os.popen("php /home/doorcontrol/public_html/admin/notify.php"):
+		for lines in os.popen("php "+homedir+"/public_html/admin/notify.php"):
 			log(lines)
 else:
 	print "no serial, exiting"
