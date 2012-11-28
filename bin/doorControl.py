@@ -12,12 +12,13 @@ import datetime
 #import time
 import sys
 import os
-import MySQLdb
+#import MySQLdb
 
-dev = '/dev/ttyUSB1'
+#dev = '/dev/ttyUSB1'
+dev = '/dev/tty.usbserial-FTEPRTPW'
 rate = 9600
 
-homedir = '/home/doorcontrol/'
+homedir = '/Users/user/doorcontrol/'
 fifoFile = homedir + "bin/fifo"
 
 
@@ -33,17 +34,32 @@ def is_running():
 	return running
 
 
+
+def executeQuery(osString):
+	bashCommand = """echo "%s" | mysql -u devicemanager --password=managedevice pushdevices | tail -1""" % osString
+	log("executing: "+bashCommand + "\n");
+	output = ""
+	for lines in os.popen(bashCommand):
+		log("output " + lines[:-1] +"\n");
+		output = lines
+	return output
+
+
 def deviceLookUp(deviceToken):
+
 	log("token "+deviceToken)
 	#queryString = 'select devicename from IOSpushDevices where devicetoken = "'+ token[:-1]+'"'
 	queryString = """select devicename from IOSpushDevices where devicetoken = '%s'""" % deviceToken[:-1]
-	log(queryString)
-	x.execute(queryString)
-	if x.rowcount > 0:
-		row = x.fetchone()
-		devId = row[0]
+	log("devicelokup" +queryString + "\n")
+	devId = executeQuery(queryString)
+	log("deviceToken:"+devId+"\n")
+	return devId
+	#x.execute(queryString)
+        #if x.rowcount > 0:
+		#row = x.fetchone()
+		#devId = row[0]
 		#print devId
-		return devId
+		#return devId
 
 		
 
@@ -89,10 +105,10 @@ else:
 		fifo.write(sys.argv[2])
 		fifo.write("\n")
 		fifo.close()
-	        if sys.argv[1] == "L":
-	                f = open(dev, 'w')
-	                f.write(sys.argv[1])
-	                f.close()
+		if sys.argv[1] == "L":
+			f = open(dev, 'w')
+			f.write(sys.argv[1])
+			f.close()
 		if sys.argv[1] == "U":
 			f = open(dev, 'w')
 			f.write(sys.argv[1])
@@ -106,8 +122,10 @@ else:
 
 ser = serial.Serial(dev, rate)
 
-conn = MySQLdb.connect("localhost", "devicemanager", "managedevice", "pushdevices")
-x=conn.cursor()
+#conn = MySQLdb.connect("127.0.0.1", "devicemanager", "managedevice", "pushdevices")
+#x=conn.cursor()
+
+
 
 fifoIn = open(fifoFile, 'r+')
 log("reading from serial\n")
@@ -121,36 +139,40 @@ if ser:
 		if output == "exit\r\n":
             		log("got exit command\n")
             		ser.close()
-            		conn.close()
+			#conn.close()
 			fifoIn.close()
             		exit()
 		elif output == "button:lockState:true\r\n":
 			token = "0001\n"
 			devId = deviceLookUp(token)
-            		x.execute("CALL ToggleLock('Main',1, '"+devId+"')")
+			#x.execute("CALL ToggleLock('Main',1, '"+devId+"')")
+			executeQuery("CALL ToggleLock('Main',1, '"+devId+"')")
 			output = str(datetime.datetime.now()) + " - L - " + token + "\n"
 			log(output)
 		elif output == "button:lockState:false\r\n":
 			token = "0001\n"
 			devId = deviceLookUp(token)
-            		x.execute("CALL ToggleLock('Main',0, '"+devId+"')")
+			#x.execute("CALL ToggleLock('Main',0, '"+devId+"')")
+			executeQuery("CALL ToggleLock('Main',0, '"+devId+"')")
 			output = str(datetime.datetime.now()) + " - U - " + token + "\n"
 			log(output)
 		elif output == "lockState:true\r\n":
 			token = fifoIn.readline()
 			devId = deviceLookUp(token)
-			querystring = """CALL ToggleLock('Main',1, "%s")""" 
-            		x.execute(querystring, devId)
-            		conn.commit()
-        	elif output == "lockState:false\r\n":
+			querystring = """CALL ToggleLock('Main',1, '%s')""" % devId
+			executeQuery(querystring)  
+			#x.execute(querystring, devId)
+			#conn.commit()
+		elif output == "lockState:false\r\n":
 			token = fifoIn.readline()
 			devId = deviceLookUp(token)
-			querystring = """CALL ToggleLock('Main',0, "%s")"""
-            		x.execute(querystring, devId)
-            		conn.commit()
+			querystring = """CALL ToggleLock('Main',0, '%s')""" % devId
+			executeQuery(querystring)
+			#x.execute(querystring, devId)
+			#conn.commit()
 		for lines in os.popen("php "+homedir+"/public_html/admin/notify.php"):
 			log(lines)
 else:
 	print "no serial, exiting"
-	conn.close()
+	#conn.close()
 	exit()
