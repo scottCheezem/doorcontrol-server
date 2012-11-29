@@ -40,8 +40,11 @@ def executeQuery(osString):
 	log("executing: "+bashCommand + "\n");
 	output = ""
 	for lines in os.popen(bashCommand):
-		log("output " + lines[:-1] +"\n");
-		output = lines
+		if(lines):
+			log("output " + lines[:-1] +"\n");
+			output = lines[:-1]
+		else:
+			log("did I get here?")
 	return output
 
 
@@ -52,7 +55,7 @@ def deviceLookUp(deviceToken):
 	queryString = """select devicename from IOSpushDevices where devicetoken = '%s'""" % deviceToken[:-1]
 	log("devicelokup" +queryString + "\n")
 	devId = executeQuery(queryString)
-	log("deviceToken:"+devId+"\n")
+	log("deviceName:"+devId+"\n")
 	return devId
 	#x.execute(queryString)
         #if x.rowcount > 0:

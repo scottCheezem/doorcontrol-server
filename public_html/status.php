@@ -1,5 +1,5 @@
 <?PHP
-
+	
     function isValidUDID($udid)
     {
         if (strlen($udid) != 64 ){  // 32 for simulator
@@ -20,7 +20,7 @@
 header("Content-type: text/json");
 `doorControl.py`;//start the daemon no matter what! if its already running, and there is no argument, it will exit..
 $output = array();
-    
+
 $con = mysql_connect("localhost", "devicemanager", "managedevice");
 if(!$con){
     

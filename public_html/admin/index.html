@@ -65,7 +65,7 @@ function authorizeDevice(id){
         console.log(data);
         getDeviceList();
 
-        $.post("notify.php", {"auth":id});
+        //$.post("notify.php", {"auth":id});
 
     });
 }
@@ -74,7 +74,7 @@ function deauthorizeDevice(id){
            
            console.log(data);
            getDeviceList();
-           $.post("notify.php", {"deauth":id});
+           //$.post("notify.php", {"deauth":id});
    });
 }
 

@@ -1,7 +1,18 @@
 <?php
 
-$con = mysql_connect("localhost", "devicemanager", "managedevice");
-	    
+	
+/*
+$deviceToken = 'a918a43a26a5e42841e14fa5f49e74d2a564ac9091d82bf31d5d042d92d0a000';
+$message = 'test';
+$extra = array("nothing"=>"nothing");
+$fp=openConnection();
+apns($deviceToken, $message, $extra, $fp);
+ closeConnection($fp);*/
+
+	 
+	 
+$con = mysql_connect("127.0.0.1", "devicemanager", "managedevice");
+
 
 //this is the defulat behaviour, which should be in some kind of notify function...
     
@@ -20,7 +31,17 @@ if(!$con){
     }else if(isset($_POST['deauth'])){
         $did = $_POST['deauth'];
         sendDeAuth($did);
-    }else{
+		
+    }else if(isset($_POST['owner'])){
+		$oid = $_POST['owner'];
+		sendOwner($oid);
+	
+	}else if(isset($_POST['unown'])){
+		$tid = $_POST['unown'];
+		sendDeOwner($tid);
+	
+	
+	}else{
         notifyState();
     }
 	
@@ -29,11 +50,43 @@ if(!$con){
 	
 mysql_close($con);
 
+ 
+ 
+    function sendOwner($id){
+		$authQuery = 'select deviceToken,StartTime,EndTime from IOSpushDevices,AuthorizedDevices where appid="net.theroyalwe.doorControl" and A_ID=P_ID and P_ID='.$id;
+        $query = mysql_query($authQuery);
+        $row = mysql_fetch_array($query);
+        $deviceToken = $row['deviceToken'];
+        
+        //remember, this is to auth a device, not invite it! well do that later...
+        $message='This device has been made an owner.';
+        $extra=array("isOwner"=>"true","isAuthed"=>"true","starttime"=>$row['StartTime'],"endtime"=>$row['EndTime']);
+        
+		
+        
+        $fp=openConnection();
+        apns($deviceToken, $message, $extra, $fp);//my message!!!
+        closeConnection($fp);
+	}
     
-    
-    
-    
-    
+    function sendDeOwner($id){
+		$authQuery = 'select deviceToken,StartTime,EndTime from IOSpushDevices,AuthorizedDevices where appid="net.theroyalwe.doorControl" and A_ID=P_ID and P_ID='.$id;
+        $query = mysql_query($authQuery);
+        $row = mysql_fetch_array($query);
+        $deviceToken = $row['deviceToken'];
+        
+        //remember, this is to auth a device, not invite it! well do that later...
+        $message='This device is no longer an owner.';
+        $extra=array("isOwner"=>"false","isAuthed"=>"true","starttime"=>$row['StartTime'],"endtime"=>$row['EndTime']);
+        
+		
+        
+        $fp=openConnection();
+        apns($deviceToken, $message, $extra, $fp);//my message!!!
+        closeConnection($fp);
+
+	}
+	
     function sendAuth($id){
 
 
@@ -86,7 +139,7 @@ mysql_close($con);
         
         //lets get the lock state and the last user to update
         
-        $lockStatequery = 'select state , user from Lock_State where 1';
+        $lockStatequery = 'select state, user from Lock_State where 1';
         $query = mysql_query($lockStatequery);
         $lockState = "";
         //since we have the "lockation" that should probably be in here too"
@@ -152,7 +205,7 @@ function openConnection(){
                 
                 
         $ctx = stream_context_create();
-        stream_context_set_option($ctx, 'ssl', 'local_cert', '/home/doorcontrol/public_html/.auth/doorControlCK.pem');
+        stream_context_set_option($ctx, 'ssl', 'local_cert', '/Users/user/doorcontrol/pushauth/doorControlCK.pem');
         stream_context_set_option($ctx, 'ssl', 'passphrase', $passphrase);
 
         // Open a connection to the APNS server

@@ -10,7 +10,7 @@ if(!$con){
     
     if(isset($_POST['id'])){
         $deleteId = $_POST['id'];
-        $query = "DELETE FROM IOSpushDevice WHERE P_ID=".$deleteId;
+        $query = "DELETE FROM IOSpushDevices WHERE P_ID=".$deleteId;
         mysql_query($query);
         echo 'Deleteing '.$deleteId;
     }
